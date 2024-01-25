@@ -1,5 +1,5 @@
 
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { http, HttpResponse } from 'msw'
 import { setupServer } from 'msw/node'
 import { Tasks } from './Tasks'
@@ -21,6 +21,11 @@ describe('Task Component', () => {
         worker.listen()
     })
 
+    // Esse código será executado antes de cada teste
+    beforeEach(() => {
+        worker.resetHandlers()
+    })
+
     // Testar requisições na API
     it('Should fetch and show tasks on button click', async () => {
         render(<Tasks />)
@@ -29,7 +34,22 @@ describe('Task Component', () => {
 
         fireEvent.click(button)
 
-        await waitFor(() => screen.getByText(/delectus aut autem/i))
-        // ou apenas "await screen.findByText(/delectus aut autem/i)
+        await screen.findByText(/delectus aut autem/i)
+        // ou apenas await waitFor(() => screen.getByText(/delectus aut autem/i))
+    })
+
+    // Testar erros de requisição
+    it('Should show error message on fetch error', async () => {
+        worker.use(http.get('https://jsonplaceholder.typicode.com/todos', () => {
+            return new HttpResponse(null, { status: 500 })
+        }))
+
+        render(<Tasks />)
+
+        const button = screen.getByText(/Get Tasks From API/i)
+
+        fireEvent.click(button)
+
+        await screen.findByText("Request failed with status code 500")
     })
 })

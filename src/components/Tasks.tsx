@@ -10,18 +10,25 @@ interface ITask {
 
 export const Tasks = () => {
     const [tasks, setTasks] = useState<Array<ITask>>([])
+    const [errorMessage, setErrorMessage] = useState<null | string>(null)
 
     const handleClick = async () => {
-        const { data } = await axios.get<Array<ITask>>('https://jsonplaceholder.typicode.com/todos?_limit=10')
+        try {
+            const { data } = await axios.get<Array<ITask>>('https://jsonplaceholder.typicode.com/todos?_limit=10')
 
-        setTasks(data)
+            setTasks(data)
+            setErrorMessage(null)
+        } catch(err: any) {
+            setErrorMessage(err.message)
+        }
     }
 
     return (
         <>
             <h1>Tasks from API</h1>
             <Button onClick={handleClick}>Get Tasks From API</Button>
-            {tasks.map(task => <p key={task.id}>{task.title}</p>)}
+            {tasks.length > 0 && tasks.map(task => <p key={task.id}>{task.title}</p>)}
+            {errorMessage}
         </>
     )
 }
