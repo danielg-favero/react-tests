@@ -27,10 +27,13 @@ describe('App Component', () => {
         const button = screen.getByText(/Change Message/i)
         fireEvent.click(button)
 
+        // Se o getByText falha: O TESTE FALHA
         screen.getByText(/Mudou/i)
-    })
 
-    // Testar estilos
+        // Se o queryByText falha: O TESTE NÃO FALHA
+        const oldMessage = screen.queryByText(/Isso vai mudar/i)
+        expect(oldMessage).toBeNull()
+    })
 })
 
 export default {}

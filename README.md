@@ -128,3 +128,27 @@ yarn add -D @types/jest ts-jest @babel/preset-typescript
   ]
 }
 ```
+
+## Usando Mock Service Worker (MSW) para mockar uma API
+
+1. Instalar o MSW
+```bash
+yarn add -D msw
+```
+
+2. Criar um `worker` dentro do arquivo de teste
+```ts
+import { setupServer } from 'msw/node'
+import { http, HttpResponse } from 'msw'
+
+const handler = http.get('https://jsonplaceholder.typicode.com/todos', () => {
+    return HttpResponse.json({
+        userId: 1,
+        id: 1,
+        title: "delectus aut autem",
+        completed: false
+    })
+})
+
+const worker = setupServer(handler)
+```
